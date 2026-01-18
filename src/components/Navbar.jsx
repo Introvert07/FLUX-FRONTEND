@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout as logoutAction } from '../slices/authSlices';
 import { logout as logoutApi } from '../api';
-import { Sun, Moon, LogOut, Shield, User as UserIcon, LayoutDashboard, ChevronDown, Menu, X } from 'lucide-react';
+import { Sun, Moon, LogOut, User as UserIcon, LayoutDashboard, ChevronDown, Menu, X } from 'lucide-react';
 import fluxLogo from '../assets/fluxlogo.png';
 
 const Navbar = () => {
@@ -30,14 +30,9 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Handle Scroll Locking (Prevent background scrolling when mobile menu is open)
+  // Handle Scroll Locking
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      // Prevent layout shift by adding padding equivalent to scrollbar width if needed
-    } else {
-      document.body.style.overflow = 'unset';
-    }
+    document.body.style.overflow = isOpen ? 'hidden' : 'unset';
     return () => { document.body.style.overflow = 'unset'; };
   }, [isOpen]);
 
@@ -48,16 +43,12 @@ const Navbar = () => {
   }, [location]);
 
   // Theme Initialization
- // 2. Updated Theme Initialization Effect
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
-    
-    // If user explicitly saved dark, or if no preference exists but you want light:
     if (savedTheme === 'dark') {
       setIsDark(true);
       document.documentElement.classList.add('dark');
     } else {
-      // DEFAULT PATH
       setIsDark(false);
       document.documentElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
@@ -71,6 +62,7 @@ const Navbar = () => {
     localStorage.setItem('theme', newDark ? 'dark' : 'light');
   };
 
+  // Scroll effect
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
@@ -78,11 +70,8 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = async () => {
-    try {
-      await logoutApi();
-    } catch (err) {
-      console.error("Logout error:", err);
-    } finally {
+    try { await logoutApi(); } catch (err) { console.error(err); } 
+    finally {
       dispatch(logoutAction());
       setIsOpen(false);
       navigate('/login', { replace: true });
@@ -90,9 +79,10 @@ const Navbar = () => {
   };
 
   const handleLogoClick = () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  setIsOpen(false); // Closes mobile menu if open
-};
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setIsOpen(false);
+  };
+
   const navLinks = [
     { name: 'About', path: '/about' },
     { name: 'Events', path: '/events' },
@@ -105,65 +95,52 @@ const Navbar = () => {
 
   return (
     <>
-      {/* NAVBAR CONTAINER 
-        - Mobile/Tablet: Always top-0
-        - Desktop (lg+): Floats at top-6 unless scrolled
-      */}
-      <nav className={`fixed w-full z-[150] transition-all duration-500 
-        ${scrolled ? 'top-0' : 'top-0 lg:top-6'}`}>
-        
-        <div className={`mx-auto transition-all duration-700 
-          ${scrolled ? 'max-w-full px-0' : 'max-w-full lg:max-w-7xl px-0 lg:px-6'}`}>
-          
+      <nav className={`fixed w-full z-[150] transition-all duration-500 ${scrolled ? 'top-0' : 'top-0 lg:top-6'}`}>
+        <div className={`mx-auto transition-all duration-700 ${scrolled ? 'max-w-full' : 'max-w-full lg:max-w-7xl px-0 lg:px-6'}`}>
           <div className={`relative flex items-center justify-between h-16 sm:h-20 px-4 sm:px-8 lg:px-10 transition-all duration-500 
             ${scrolled 
               ? 'bg-white/95 dark:bg-black/95 backdrop-blur-2xl border-b border-gray-200 dark:border-cyan-500/30' 
               : 'bg-white/90 dark:bg-black/80 lg:dark:bg-white/[0.03] backdrop-blur-md border-b lg:border border-gray-200 dark:border-white/10 lg:rounded-2xl shadow-lg lg:shadow-2xl'}`}>
             
-            {/* --- LOGO SECTION --- */}
-           {/* --- LOGO SECTION --- */}
-{/* --- LOGO SECTION --- */}
-<Link 
-  to="/" 
-  onClick={handleLogoClick}
-  className="flex items-center gap-2 sm:gap-4 group relative shrink-0 z-[160]"
->
-  <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 flex items-center justify-center group">
-  {/* Engineering Grid / Orbit Ring */}
-  <div className="absolute inset-0 border-[1px] border-cyan-500/20 rounded-full group-hover:border-cyan-500/50 group-hover:scale-125 transition-all duration-500"></div>
-  
-  {/* Rotating Tech Bracket - Only visible on hover */}
-  <div className="absolute inset-[-4px] border-t-2 border-l-2 border-cyan-500 rounded-full opacity-0 group-hover:opacity-100 group-hover:rotate-180 transition-all duration-700 ease-in-out"></div>
+            {/* --- LOGO SECTION (Restored Desktop Animations) --- */}
+            <Link 
+              to="/" 
+              onClick={handleLogoClick}
+              className="flex items-center gap-2 sm:gap-4 group relative shrink-0 z-[160]"
+            >
+              <div className="relative w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 flex items-center justify-center group">
+                {/* Engineering Grid / Orbit Ring */}
+                <div className="absolute inset-0 border-[1px] border-cyan-500/20 rounded-full group-hover:border-cyan-500/50 group-hover:scale-125 transition-all duration-500"></div>
+                
+                {/* Rotating Tech Bracket - Only visible on hover */}
+                <div className="absolute inset-[-4px] border-t-2 border-l-2 border-cyan-500 rounded-full opacity-0 group-hover:opacity-100 group-hover:rotate-180 transition-all duration-700 ease-in-out hidden lg:block"></div>
 
-  {/* Logo Image with Glitch/Glow effect */}
-  <div className="relative overflow-hidden">
-    <img 
-      src={fluxLogo} 
-      alt="Flux" 
-      className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 object-contain z-10 
-                 filter drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]
-                 group-hover:scale-110 group-hover:brightness-125
-                 transition-all duration-300" 
-    />
-    
-    {/* Technical "Scanline" Overlay */}
-    <div className="absolute inset-0 w-full h-[2px] bg-cyan-400/50 -translate-y-10 group-hover:animate-[scan_1.5s_ease-in-out_infinite] pointer-events-none"></div>
-  </div>
-</div>
-  
-  <div className="flex flex-col">
-    <div className="flex items-center gap-1">
-      <span className="text-black dark:text-white text-xl sm:text-2xl lg:text-3xl font-black tracking-tighter leading-none uppercase">
-        FLUX
-      </span>
-      <span className={`w-1.5 h-1.5 rounded-full ${userInfo ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-red-500 shadow-[0_0_8px_#ef4444]'}`}></span>
-    </div>
-    <span className="text-[8px] lg:text-[10px] text-cyan-600 dark:text-cyan-400 font-mono tracking-[0.2em] lg:tracking-[0.3em] uppercase mt-0.5 font-bold">
-      TECHNICAL CLUB
-    </span>
-  </div>
-</Link>
-            {/* --- DESKTOP NAVIGATION (Hidden on Mobile/Tablet) --- */}
+                {/* Logo Image with Glitch/Glow effect */}
+                <div className="relative overflow-hidden">
+                  <img 
+                    src={fluxLogo} 
+                    alt="Flux" 
+                    className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8 object-contain z-10 
+                             lg:filter lg:drop-shadow-[0_0_8px_rgba(6,182,212,0.8)]
+                             group-hover:scale-110 group-hover:brightness-125
+                             transition-all duration-300" 
+                  />
+                  
+                  {/* Technical "Scanline" Overlay (Desktop Only) */}
+                  <div className="absolute inset-0 w-full h-[2px] bg-cyan-400/50 -translate-y-10 group-hover:animate-[scan_1.5s_ease-in-out_infinite] pointer-events-none hidden lg:block"></div>
+                </div>
+              </div>
+              
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1">
+                  <span className="text-black dark:text-white text-xl sm:text-2xl lg:text-3xl font-black tracking-tighter leading-none uppercase">FLUX</span>
+                  <span className={`w-1.5 h-1.5 rounded-full ${userInfo ? 'bg-green-500 shadow-[0_0_8px_#22c55e]' : 'bg-red-500 shadow-[0_0_8px_#ef4444]'}`}></span>
+                </div>
+                <span className="text-[8px] lg:text-[10px] text-cyan-600 dark:text-cyan-400 font-mono tracking-[0.2em] lg:tracking-[0.3em] uppercase mt-0.5 font-bold">TECHNICAL CLUB</span>
+              </div>
+            </Link>
+
+            {/* --- DESKTOP NAVIGATION (Restored Hover Animations) --- */}
             <div className="hidden xl:flex items-center space-x-1">
               {navLinks.map((link) => (
                 <Link
@@ -172,16 +149,16 @@ const Navbar = () => {
                   className={`relative px-3 py-2 text-[10px] font-bold uppercase tracking-[0.2em] transition-all group overflow-hidden
                     ${location.pathname === link.path ? 'text-cyan-500' : 'text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white'}`}
                 >
+                  {/* Sliding Text Effect */}
                   <span className="relative z-10 transition-transform duration-300 group-hover:-translate-y-full block">{link.name}</span>
                   <span className="absolute inset-0 z-10 flex items-center justify-center translate-y-full group-hover:translate-y-0 transition-transform duration-300 text-cyan-500">{link.name}</span>
                 </Link>
               ))}
             </div>
 
-            {/* --- RIGHT TOOLS (Theme, User, Mobile Toggle) --- */}
+            {/* --- RIGHT TOOLS --- */}
             <div className="flex items-center gap-2 sm:gap-4 z-[160]">
               
-              {/* Desktop Theme & User (Hidden on Mobile) */}
               <div className="hidden xl:flex items-center gap-4">
                 <button onClick={toggleTheme} className="p-2 rounded-full border border-cyan-500/20 hover:bg-cyan-500/10 transition-colors">
                   {isDark ? <Sun size={18} className="text-cyan-400" /> : <Moon size={18} className="text-cyan-600" />}
@@ -219,14 +196,13 @@ const Navbar = () => {
                 )}
               </div>
 
-              {/* MOBILE/TABLET TOGGLE BUTTON */}
+              {/* MOBILE TOGGLE */}
               <button 
                 onClick={(e) => {
                   e.stopPropagation();
                   setIsOpen(!isOpen);
                 }} 
                 className="xl:hidden relative p-2 text-cyan-500 active:scale-90 transition-transform rounded-lg hover:bg-cyan-500/10"
-                aria-label="Toggle menu"
               >
                 {isOpen ? <X size={28} /> : <Menu size={28} />}
               </button>
@@ -235,85 +211,59 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* MOBILE/TABLET MENU OVERLAY 
-        - Uses min-h-dvh for dynamic viewport height support
-        - Top padding ensures content starts below navbar
-      */}
-      <div className={`fixed inset-0 w-full min-h-dvh bg-white/95 dark:bg-black/95 backdrop-blur-2xl z-[140] transition-all duration-500 xl:hidden flex flex-col
-        ${isOpen ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0 pointer-events-none'}`}>
-        
-        {/* Scrollable Content Container */}
-        <div className="flex-1 overflow-y-auto pt-24 pb-10 px-6">
-          <div className="flex flex-col items-center justify-start space-y-8 min-h-full">
-            
-            {/* Mobile User Profile */}
-            {userInfo && (
-              <div className="flex flex-col items-center animate-in slide-in-from-top-4 duration-500 delay-100">
-                <div className="w-16 h-16 rounded-full border-2 border-cyan-500 flex items-center justify-center mb-3 shadow-[0_0_20px_rgba(6,182,212,0.3)]">
-                  <UserIcon size={32} className="text-cyan-500" />
-                </div>
-                <span className="text-xl font-black text-black dark:text-white uppercase tracking-tighter text-center max-w-[250px] truncate leading-tight">
-                  {userInfo.name}
-                </span>
-                <span className="text-xs font-mono text-cyan-500 uppercase tracking-[0.3em] mt-1">{userInfo.role || 'Member'}</span>
+      {/* --- MOBILE/TABLET MENU (Simple Grid Layout) --- */}
+      <div className={`fixed inset-0 w-full h-screen bg-white dark:bg-black z-[140] transition-transform duration-300 xl:hidden ${isOpen ? 'translate-y-0' : '-translate-y-full'}`}>
+        <div className="flex flex-col h-full pt-20 px-6 pb-10">
+          
+          {/* Mobile User Profile */}
+          {userInfo && (
+            <div className="flex items-center gap-4 p-4 mb-6 bg-gray-50 dark:bg-white/5 rounded-2xl border border-gray-100 dark:border-white/5">
+              <div className="w-12 h-12 rounded-full border border-cyan-500/50 flex items-center justify-center">
+                <UserIcon size={24} className="text-cyan-500" />
               </div>
-            )}
-
-            {/* Mobile Links */}
-            <div className="flex flex-col items-center space-y-5 w-full">
-              {navLinks.map((link, index) => (
-                <Link
-                  key={link.name}
-                  to={link.path}
-                  onClick={() => setIsOpen(false)}
-                  className="group w-full text-center py-2 relative overflow-hidden"
-                >
-                  <div className="flex items-baseline justify-center gap-3 text-3xl sm:text-4xl font-black tracking-tighter text-black dark:text-white active:text-cyan-500 transition-colors">
-                    <span className="text-[10px] font-mono text-cyan-500/40 tracking-widest -translate-y-4">0{index + 1}</span>
-                    {link.name}
-                  </div>
-                </Link>
-              ))}
+              <div>
+                <p className="text-sm font-black text-black dark:text-white uppercase truncate max-w-[150px]">{userInfo.name}</p>
+                <p className="text-[9px] font-mono text-cyan-500 uppercase tracking-widest">{userInfo.role || 'Member'}</p>
+              </div>
             </div>
+          )}
 
-            {/* Mobile Actions */}
-            <div className="w-full max-w-xs space-y-4 pt-4 mt-auto">
-              <button 
-                onClick={toggleTheme} 
-                className="w-full flex items-center justify-center gap-3 text-cyan-600 dark:text-cyan-400 font-mono text-xs font-bold tracking-widest uppercase py-3 border border-cyan-500/20 rounded-xl bg-cyan-500/5 active:bg-cyan-500/20 transition-all"
+          {/* Mobile Navigation Grid */}
+          <div className="grid grid-cols-2 gap-3 mb-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.path}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-center h-16 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-2xl text-[11px] font-bold uppercase tracking-widest active:bg-cyan-500/10 active:text-cyan-500 transition-all"
               >
-                {isDark ? <Sun size={18}/> : <Moon size={18}/>}
-                {isDark ? 'Light_Mode' : 'Dark_Mode'}
+                {link.name}
+              </Link>
+            ))}
+          </div>
+
+          {/* Mobile Footer Actions */}
+          <div className="mt-auto space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={toggleTheme} className="flex items-center justify-center gap-2 h-12 border border-gray-100 dark:border-white/10 rounded-xl text-[10px] font-bold uppercase">
+                {isDark ? <Sun size={14}/> : <Moon size={14}/>} {isDark ? 'Light' : 'Dark'}
               </button>
-              
-              <div className="w-full grid grid-cols-1 gap-3">
-                {!userInfo ? (
-                  <Link 
-                    to="/login" 
-                    onClick={() => setIsOpen(false)}
-                    className="w-full text-center py-3 bg-cyan-500 text-white dark:text-black font-bold uppercase tracking-widest text-xs rounded-xl shadow-[0_0_15px_rgba(6,182,212,0.4)]"
-                  >
-                    System_Access
-                  </Link>
-                ) : (
-                  <>
-                    <Link 
-                      to="/dashboard" 
-                      onClick={() => setIsOpen(false)}
-                      className="w-full flex items-center justify-center gap-2 py-3 bg-cyan-500/10 border border-cyan-500/30 text-cyan-500 font-bold uppercase tracking-widest text-xs rounded-xl"
-                    >
-                      <LayoutDashboard size={14} /> Access_Dashboard
-                    </Link>
-                    <button 
-                      onClick={handleLogout} 
-                      className="w-full flex items-center justify-center gap-2 py-3 border border-red-500/30 text-red-500 font-bold uppercase tracking-widest text-xs bg-red-500/5 rounded-xl hover:bg-red-500/10"
-                    >
-                      <LogOut size={14} /> Terminate
-                    </button>
-                  </>
-                )}
-              </div>
+              {userInfo ? (
+                <Link to="/dashboard" onClick={() => setIsOpen(false)} className="flex items-center justify-center gap-2 h-12 bg-cyan-500/10 text-cyan-500 rounded-xl text-[10px] font-bold uppercase">
+                  <LayoutDashboard size={14} /> Dashboard
+                </Link>
+              ) : (
+                <Link to="/login" onClick={() => setIsOpen(false)} className="flex items-center justify-center h-12 bg-cyan-500 text-white dark:text-black rounded-xl text-[10px] font-bold uppercase">
+                  Login
+                </Link>
+              )}
             </div>
+            
+            {userInfo && (
+              <button onClick={handleLogout} className="w-full h-12 flex items-center justify-center gap-2 border border-red-500/20 text-red-500 bg-red-500/5 rounded-xl text-[10px] font-bold uppercase">
+                <LogOut size={14} /> Terminate Session
+              </button>
+            )}
           </div>
         </div>
       </div>
