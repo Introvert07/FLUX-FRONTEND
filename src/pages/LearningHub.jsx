@@ -13,7 +13,6 @@ const COUPONS = [
 
 const TUTEDUDE_URL = "https://tutedude.com/";
 
-// Added your new playlists here and removed titles as requested
 const RESOURCES = [
   { id: "PLu0W_9lII9agq5TrH9XLIKQvv0iaF2X3w", isPlaylist: true, thumbnail: "https://img.youtube.com/vi/61XG0fV5m0w/maxresdefault.jpg" },
   { id: "PLu0W_9lII9ahR1blWXxgSlL4y9iQBnLpR", isPlaylist: true, thumbnail: "https://img.youtube.com/vi/ER9SspLe4Hg/maxresdefault.jpg" },
