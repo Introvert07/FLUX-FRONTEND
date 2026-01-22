@@ -1,0 +1,11 @@
+# 1. Build Settings: Tells Netlify how to build your app
+[build]
+  command = "npm run build"   # Change to "yarn build" if using yarn
+  publish = "dist"            # Use "dist" for Vite, or "build" for Create React App
+
+# 2. Redirects: Essential for React/Vite/Vue apps
+# This prevents the 404 error when you refresh a page like /dashboard
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
